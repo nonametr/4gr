@@ -1,0 +1,1 @@
+./windeployqt.exe -qmldir  ~/Projects/4grunner/ ~/Projects/build/4grunner.exe --no-angle --release --no-system-d3d-compiler --no-webkit2 --no-opengl-sw

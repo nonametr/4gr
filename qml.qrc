@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>click_area.png</file>
+        <file>button-start-game.png</file>
+        <file>icons/go-next.png</file>
+        <file>icons/go-previous.png</file>
+        <file>icons/process-stop.png</file>
+        <file>icons/view-refresh.png</file>
+        <file>lineage_2_background_by_vas_co.jpg</file>
+        <file>tray-icon.png</file>
+        <file>tray.qml</file>
+        <file>update.qml</file>
+        <file>right_bot_corner.png</file>
+    </qresource>
+</RCC>
