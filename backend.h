@@ -24,6 +24,8 @@ public:
     static Q_INVOKABLE QUrl fromUserInput(const QString& userInput);
     Q_INVOKABLE void beginStartGame(int id);
     Q_INVOKABLE void interceptGame(int id);
+    Q_INVOKABLE void killGame(int id);
+    Q_INVOKABLE bool isInGame(int id);
     static Q_INVOKABLE void restart();
 
     void waitForGame(int id);
@@ -32,6 +34,7 @@ public:
     Config config;
     std::set<HWND> newWindows;
     std::set<HWND> knownWindows;
+    std::map<int, HWND> activeGames; //<profile_id, GameWindow>
 
 signals:
     void readyToLaunch(int id);

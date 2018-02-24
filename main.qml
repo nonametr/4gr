@@ -806,6 +806,18 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
         }
 
         MenuItem {
+            text: "Kill"
+            onTriggered: {
+                if (backend.isInGame(tabMenu.tabId)) {
+                    backend.killGame(tabMenu.tabId)
+                } else {
+                    infoDialog.text = "This profile currently not in game!"
+                    infoDialog.open()
+                }
+            }
+        }
+
+        MenuItem {
             text: "Reload"
             onTriggered: {
                 tabView.getTab(tabMenu.tabId).item.reload()
@@ -970,6 +982,14 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
         }
         onNo: console.log("disabled")
     }
+    MessageDialog {
+        id: infoDialog
+        title: "Info"
+        icon: StandardIcon.Information
+        text: "put text before showing this dialog!"
+        standardButtons: standardButton.Ok
+    }
+
     MessageDialog {
         id: keepAliveDialog
         title: "Keep alive?"
