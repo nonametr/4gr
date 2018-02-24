@@ -1274,22 +1274,19 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
             anchors.bottomMargin: 5
             anchors.rightMargin: 5
             onClicked: {
-                countDownTimer.running = false
                 autoStartDialog.close()
             }
         }
 
         onVisibleChanged: {
-            if (visible === false) {
-                countDownTimer.running = false
-            }
+            countDownTimer.running = visible
         }
 
         Timer {
             id: countDownTimer
             property var start_countdown: 4
             property var ready_to_start: false
-            running: true
+            running: false
             interval: 1000
             repeat: true
             onTriggered: {

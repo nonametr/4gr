@@ -35,7 +35,7 @@ bool UpdaterBackend::checkForNewVersion()
 
 void UpdaterBackend::downloadNewVersion()
 {
-    QUrl url("http://magicmess.online/4grunner/4grunner.exe");
+    QUrl url("http://magicmess.online/4grunner/4gr.exe");
     reply = network->get(QNetworkRequest(url));
 
     QObject::connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64)));

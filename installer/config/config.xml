@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>4GR</Name>
+    <Version>1.0.2</Version>
+    <Title>4GR 1.0.2 Installer</Title>
+    <Publisher>magicmess.online</Publisher>
+    <StartMenuDir>4GR</StartMenuDir>
+    <TargetDir>@HomeDir@/4GR</TargetDir>
+	<ProductUrl>http://www.magicmess.online/4gr</ProductUrl>
+	<InstallerWindowIcon>tray_icon</InstallerWindowIcon>
+	<InstallerApplicationIcon>tray_icon</InstallerApplicationIcon>
+    <Logo>logo.png</Logo>
+	<RunProgram>@TargetDir@/4gr.exe</RunProgram>
+	<AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
+	<WizardStyle>Modern</WizardStyle>
+</Installer>

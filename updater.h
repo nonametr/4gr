@@ -4,8 +4,8 @@
 #include <QEventLoop>
 #include <QObject>
 
-#define APP_NAME "4grunner"
-#define APP_NAME_NEW "4grunner_new"
+#define APP_NAME "4gr"
+#define APP_NAME_NEW "4gr_new"
 
 class QNetworkAccessManager;
 class QNetworkReply;

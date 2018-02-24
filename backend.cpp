@@ -9,6 +9,7 @@
 #include <QQuickItem>
 #include <QTimer>
 #include <QtDebug>
+#include <assert.h>
 #include <future>
 #include <iostream>
 #include <stdio.h>
@@ -135,6 +136,6 @@ void Backend::killGame(int id)
 
 void Backend::restart()
 {
-    QProcess::startDetached(qApp->applicationDirPath() + "/4grunner.exe", qApp->arguments());
+    QProcess::startDetached(qApp->applicationDirPath() + "/4gr.exe", qApp->arguments());
     QCoreApplication::quit();
 }

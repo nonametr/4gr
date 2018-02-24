@@ -40,5 +40,4 @@ HEADERS += \
     config.h \
     updater.h \
     maskedmousearea.h \
-    singleton.h \
     winapi.h

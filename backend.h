@@ -2,7 +2,6 @@
 #define BACKEND_H
 
 #include "config.h"
-#include "singleton.h"
 #include <qwindowdefs_win.h>
 #include <set>
 #include <stdint.h>

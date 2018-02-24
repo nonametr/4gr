@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>4GR</DisplayName>
+    <Description>Helper tool which enables you to automate and speed up multiple game windows loading and setup.</Description>
+    <Version>1.0.2</Version>
+    <ReleaseDate>2018-02-24</ReleaseDate>
+    <Default>true</Default>
+    <Script>installscript.qs</Script>
+    <Licenses>
+        <License name="GNU General Public License" file="license.txt" />
+    </Licenses>
+</Package>

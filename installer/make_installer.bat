@@ -1,0 +1,1 @@
+c:\\Qt\QtIFW-3.0.2\bin\binarycreator.exe -c config\config.xml -p packages 4gr_installer.exe

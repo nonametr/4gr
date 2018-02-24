@@ -18,18 +18,18 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("4GRunner");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-    if (QFileInfo(QCoreApplication::applicationFilePath()).fileName() == "4grunner_new.exe")
+    if (QFileInfo(QCoreApplication::applicationFilePath()).fileName() == "4gr_new.exe")
     {
-        QFile::remove(qApp->applicationDirPath() + "/4grunner.exe");
-        QFile::copy(qApp->applicationDirPath() + "/4grunner_new.exe", qApp->applicationDirPath() + "/4grunner.exe");
+        QFile::remove(qApp->applicationDirPath() + "/4gr.exe");
+        QFile::copy(qApp->applicationDirPath() + "/4gr_new.exe", qApp->applicationDirPath() + "/4gr.exe");
 
-        QProcess::startDetached(qApp->applicationDirPath() + "/4grunner.exe", qApp->arguments());
+        QProcess::startDetached(qApp->applicationDirPath() + "/4gr.exe", qApp->arguments());
         QCoreApplication::quit();
         return EXIT_SUCCESS;
     }
-    else if (QFileInfo::exists(qApp->applicationDirPath() + "/4grunner_new.exe"))
+    else if (QFileInfo::exists(qApp->applicationDirPath() + "/4gr_new.exe"))
     {
-        QFile::remove(qApp->applicationDirPath() + "/4grunner_new.exe");
+        QFile::remove(qApp->applicationDirPath() + "/4gr_new.exe");
     }
 
     QQmlApplicationEngine engine;
