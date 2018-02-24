@@ -4,14 +4,15 @@
 
 #include <psapi.h>
 
-// Global variable.
+// Global variables
+DWORD pid;
 HWINEVENTHOOK g_hook;
 
 // Callback function that handles events.
 //
 void CALLBACK HandleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
-    Backend* backend = Backend::getSingletonPtr();
+    Backend* backend = Backend::get();
     auto it_match = backend->gameProfileMap.find(hwnd);
     if (it_match != backend->gameProfileMap.end())
     {
@@ -26,6 +27,7 @@ void CALLBACK HandleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG id
 //
 void initializeHook()
 {
+    pid = GetCurrentProcessId();
     CoInitialize(NULL);
     g_hook = SetWinEventHook(
         EVENT_OBJECT_DESTROY, EVENT_OBJECT_DESTROY, // Range of events (4 to 5).
@@ -61,11 +63,11 @@ BOOL CALLBACK enumWindowsCallback(HWND hwnd, LPARAM lParam)
 {
     char title[50];
     std::set<HWND> windows = *((std::set<HWND>*)lParam);
-    Backend* backend = Backend::getSingletonPtr();
+    Backend* backend = Backend::get();
 
     DWORD lpdwProcessId;
     GetWindowThreadProcessId(hwnd, &lpdwProcessId);
-    if (lpdwProcessId != backend->pid)
+    if (lpdwProcessId != pid)
     {
         GetWindowTextA(hwnd, (LPSTR)title, sizeof(title));
         if (QString(title) == backend->config.getTargetWindowName())

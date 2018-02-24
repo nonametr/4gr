@@ -7,12 +7,14 @@
 #include <set>
 #include <stdint.h>
 
-class Backend : public QObject, public Singleton<Backend>
+class Backend : public QObject
 {
     Q_OBJECT
 public:
     Backend(QObject* parent = 0);
     virtual ~Backend();
+
+    static Backend* get() { return _instance; }
 
     static Q_INVOKABLE QUrl fromUserInput(const QString& userInput);
     static Q_INVOKABLE void restart();
@@ -22,7 +24,6 @@ public:
 
     void waitForGame(int id);
 
-    uint64_t pid;
     Config config;
 
     std::set<HWND> knownWindows;
@@ -33,6 +34,9 @@ signals:
     void readyToLaunch(int id);
     void gameIntercepted(int id);
     void endLaunch();
+
+private:
+    static Backend* _instance;
 };
 
 #endif // BACKEND_H

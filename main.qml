@@ -480,8 +480,7 @@ target.dispatchEvent(evt);")
                         width: 10
                         height: 10
                         radius: height * 0.5
-                        color: tabView.getTab(
-                                   styleData.index).item.loading ? "yellow" : "green"
+                        color: config.profiles[styleData.index].is_running ? "green" : (tabView.getTab(styleData.index).item.loading ? "red" : "yellow")
                         visible: styleData.index !== tabView.count - 1
 
                         BusyIndicator {

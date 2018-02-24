@@ -1,5 +1,4 @@
 #include "backend.h"
-
 #include "winapi.h"
 #include <QFileInfo>
 #include <QGuiApplication>
@@ -16,18 +15,20 @@
 #include <string>
 #include <tchar.h>
 
-initialiseSingleton(Backend);
+Backend* Backend::_instance = nullptr;
 
 Backend::Backend(QObject* parent) : QObject(parent)
 {
-    //initializeHook();
-    pid = GetCurrentProcessId();
+    assert(_instance == 0);
+    _instance = this;
+
+    initializeHook();
     config.load(CONFIG_PATH);
 }
 
 Backend::~Backend()
 {
-    //shutdownHook();
+    shutdownHook();
 }
 
 QUrl Backend::fromUserInput(const QString& userInput)

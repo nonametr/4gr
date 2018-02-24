@@ -21,6 +21,7 @@ enum ConfigField : uint8_t
     START_POS,
     DEFAULT_URL,
     TARGET_WINDOW_NAME,
+    START_AFTER_PROCESS,
     AUTO_START,
     KEEP_ALIVE,
     SHOW_NAVIGATION,
@@ -125,7 +126,7 @@ public:
 
     void dataChanged(uint8_t field_id, QVariant new_val);
 
-    bool _isRunning;
+    bool _isRunning = false;
     map<uint8_t, QVariant> data;
     static const map<uint8_t, FieldData> field_data;
 
@@ -153,6 +154,7 @@ class Config : public QObject
     Q_PROPERTY(bool autostart READ getAutoStart WRITE setAutoStart NOTIFY autoStartChanged)
     Q_PROPERTY(bool keep_alive READ getKeepAlive WRITE setKeepAlive NOTIFY keepAliveChanged)
     Q_PROPERTY(QString default_url READ getDefaultUrl WRITE setDefaultUrl NOTIFY defaultUrlChanged)
+    Q_PROPERTY(QString start_after_process READ getStartAfterProcess WRITE setStartAfterProcess NOTIFY startAfterProcessChanged)
     Q_PROPERTY(QString window_name READ getTargetWindowName WRITE setTargetWindowName NOTIFY targetWindowNameChanged)
     Q_PROPERTY(QList<QObject*> profiles READ getProfiles NOTIFY profilesChanged)
     Q_PROPERTY(QVector2D start_pos READ getStartPos WRITE setStartPos NOTIFY startPosChanged)
@@ -178,6 +180,7 @@ public:
 
     QList<QObject*> getProfiles() const { return _profiles; }
     QString getTargetWindowName() const { return data.at(ConfigField::TARGET_WINDOW_NAME).value<QString>(); }
+    QString getStartAfterProcess() const { return data.at(ConfigField::START_AFTER_PROCESS).value<QString>(); }
     QString getDefaultUrl() const { return data.at(ConfigField::DEFAULT_URL).value<QString>(); }
     bool getKeepAlive() const { return data.at(ConfigField::KEEP_ALIVE).value<bool>(); }
     bool getAutoStart() const { return data.at(ConfigField::AUTO_START).value<bool>(); }
@@ -211,6 +214,10 @@ public:
     {
         dataChanged(ConfigField::TARGET_WINDOW_NAME, new_val);
     }
+    void setStartAfterProcess(const QString& new_val)
+    {
+        dataChanged(ConfigField::START_AFTER_PROCESS, new_val);
+    }
     void setDefaultUrl(const QString& new_val)
     {
         dataChanged(ConfigField::DEFAULT_URL, new_val);
@@ -240,6 +247,7 @@ signals:
     void showImagesChanged();
     void startPosChanged();
     void delayChanged();
+    void startAfterProcessChanged();
 
 private:
     QList<QObject*> _profiles;

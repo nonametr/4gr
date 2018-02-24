@@ -37,13 +37,13 @@ int main(int argc, char* argv[])
 
     qmlRegisterType<MaskedMouseArea>("MMOMaskedMouseArea", 1, 0, "MaskedMouseArea");
 
-    Backend* backend = Backend::create();
+    Backend* backend = new Backend();
     unique_ptr<UpdaterBackend> updBackend{ new UpdaterBackend() };
     ctxt->setContextProperty("backend", backend);
     ctxt->setContextProperty("updaterBackend", updBackend.get());
     ctxt->setContextProperty("config", &backend->config);
 
-    engine.load(QUrl(QStringLiteral("qrc:/settings.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     if (engine.rootObjects().isEmpty())
         return -1;

@@ -11,12 +11,14 @@ const map<uint8_t, FieldData> Config::field_data = {
     { ConfigField::VERSION, { "version", "1.0" } },
     { ConfigField::DEFAULT_URL, { "default_url", "https://ru.4game.com/lineage2classic/play/" } },
     { ConfigField::TARGET_WINDOW_NAME, { "target_window_name", "Lineage II" } },
+    { ConfigField::START_AFTER_PROCESS, { "start_after", "Frost" } },
     { ConfigField::AUTO_START, { "auto_start", false } },
     { ConfigField::KEEP_ALIVE, { "keep_alive", false } },
     { ConfigField::SHOW_NAVIGATION, { "show_navigation", true } },
     { ConfigField::SHOW_SSL_ERRORS, { "show_ssl_errors", false } },
     { ConfigField::SHOW_IMAGES, { "show_images", false } },
-    { ConfigField::START_POS, { "start_pos", QVector2D(20, 500) } }
+    { ConfigField::START_POS, { "start_pos", QVector2D(20, 500) } },
+    { ConfigField::DELAY, { "delay", 0.0f } },
 };
 
 const map<uint8_t, FieldData> ProfileConfig::field_data = {
@@ -77,8 +79,10 @@ void Config::dataChanged(uint8_t field_id, QVariant new_val)
         return showSSLErrorsChanged();
     case SHOW_IMAGES:
         return showImagesChanged();
-    case ConfigField::DELAY:
+    case DELAY:
         return delayChanged();
+    case START_AFTER_PROCESS:
+        return startAfterProcessChanged();
     default:
         break;
     }
