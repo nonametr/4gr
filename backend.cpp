@@ -49,9 +49,17 @@ BOOL CALLBACK enumWindowsCallback(HWND hwnd, LPARAM lParam)
 
 void Backend::beginStartGame(int id)
 {
-    EnumWindows(enumWindowsCallback, (LPARAM)this);
-    knownWindows.insert(newWindows.begin(), newWindows.end());
-    emit readyToLaunch(id);
+    ProfileConfig* profile = (ProfileConfig*)config.getProfiles()[id];
+    if (profile->getEnabled())
+    {
+        EnumWindows(enumWindowsCallback, (LPARAM)this);
+        knownWindows.insert(newWindows.begin(), newWindows.end());
+        emit readyToLaunch(id);
+    }
+    else
+    {
+        gameIntercepted(id);
+    }
 }
 
 void Backend::waitForGame(int id)

@@ -458,10 +458,10 @@ target.dispatchEvent(evt);")
 
                     Rectangle {
                         anchors.fill: parent
-                        visible: styleData.pressed || !styleData.selected
-                                 || styleData.activeFocus
-                        opacity: styleData.enabled ? 1.0 : FlatStyle.disabledOpacity
-                        color: styleData.activeFocus ? (styleData.pressed ? FlatStyle.checkedFocusedAndPressedColor : FlatStyle.focusedColor) : styleData.pressed ? FlatStyle.pressedColor : styleData.selected ? FlatStyle.backgroundColor : !styleData.enabled ? FlatStyle.disabledColor : FlatStyle.styleColor
+                        visible: true
+                        color: styleData.selected ? (config.profiles[styleData.index].enabled ? "#00ff67" : "#a0a0a0") : (config.profiles[styleData.index].enabled ? "#00ad45" : "#636363")
+                        opacity: styleData.pressed ? 1.0 : 0.8
+                        //color: styleData.activeFocus ? (styleData.pressed ? FlatStyle.checkedFocusedAndPressedColor : FlatStyle.focusedColor) : styleData.pressed ? FlatStyle.pressedColor : styleData.selected ? FlatStyle.backgroundColor : !styleData.enabled ? FlatStyle.disabledColor : FlatStyle.styleColor
                     }
                     Rectangle {
                         id: statusRect
@@ -793,6 +793,15 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
             text: "Rename"
             onTriggered: {
                 renameDialog.show()
+            }
+        }
+
+        MenuItem {
+            text: "Enable\Disable"
+            checkable: true
+            checked: config.profiles[tabMenu.tabId].enabled
+            onTriggered: {
+                config.profiles[tabMenu.tabId].enabled = !config.profiles[tabMenu.tabId].enabled
             }
         }
 

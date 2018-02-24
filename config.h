@@ -34,7 +34,8 @@ enum ProfileConfigField : uint8_t
     WINDOW_POS,
     SCROLL_POS,
     TARGET_POS,
-    URL
+    URL,
+    ENABLED
 };
 
 struct FieldData
@@ -48,6 +49,7 @@ class Config;
 class ProfileConfig : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool enabled READ getEnabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QVector4D win_pos READ getWindowPos WRITE setWindowPos NOTIFY windowPosChanged)
@@ -80,7 +82,15 @@ public:
     {
         return data.at(ProfileConfigField::URL).value<QString>();
     }
+    bool getEnabled() const
+    {
+        return data.at(ProfileConfigField::ENABLED).value<bool>();
+    }
 
+    void setEnabled(bool new_val)
+    {
+        dataChanged(ProfileConfigField::ENABLED, new_val);
+    }
     void setName(const QString& new_val)
     {
         dataChanged(ProfileConfigField::NAME, new_val);
@@ -114,6 +124,7 @@ signals:
     void scrollPosChanged();
     void targetPosChanged();
     void urlChanged();
+    void enabledChanged();
 
 private:
     Config* _owner;

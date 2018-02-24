@@ -24,7 +24,8 @@ const map<uint8_t, FieldData> ProfileConfig::field_data = {
     { ProfileConfigField::URL, { "url", "https://ru.4game.com/lineage2classic/play/" } },
     { ProfileConfigField::WINDOW_POS, { "window_pos", QVector4D(10, 40, 640, 480) } },
     { ProfileConfigField::SCROLL_POS, { "scroll_pos", QVector2D(0, 0) } },
-    { ProfileConfigField::TARGET_POS, { "target_pos", QVector2D(760, 380) } }
+    { ProfileConfigField::TARGET_POS, { "target_pos", QVector2D(760, 380) } },
+    { ProfileConfigField::ENABLED, { "enabled", true } }
 };
 
 void ProfileConfig::dataChanged(uint8_t field_id, QVariant new_val)
@@ -44,6 +45,8 @@ void ProfileConfig::dataChanged(uint8_t field_id, QVariant new_val)
         return targetPosChanged();
     case URL:
         return urlChanged();
+    case ENABLED:
+        return enabledChanged();
     default:
         break;
     }
