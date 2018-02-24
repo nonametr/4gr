@@ -26,6 +26,9 @@ public:
 
     Config config;
 
+    void addGameWindow(int profile_id, HWND hwnd);
+    void removeGameWindow(int profile_id, HWND hwnd);
+
     std::set<HWND> knownWindows;
     std::map<int, HWND> profileGameMap; //<profile_id, GameWindow>
     std::map<HWND, int> gameProfileMap; //<GameWindow, profile_id>

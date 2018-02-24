@@ -16,10 +16,7 @@ void CALLBACK HandleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG id
     auto it_match = backend->gameProfileMap.find(hwnd);
     if (it_match != backend->gameProfileMap.end())
     {
-        ProfileConfig* profile = (ProfileConfig*)backend->config.getProfiles()[it_match->second];
-        profile->setIsRunning(false);
-        backend->gameProfileMap.erase(it_match);
-        backend->profileGameMap.erase(it_match->second);
+        backend->removeGameWindow(it_match->second, it_match->first);
     }
 }
 
@@ -62,7 +59,7 @@ BOOL CALLBACK enumTerminateWindowsCallback(HWND hwnd, LPARAM lParam)
 BOOL CALLBACK enumWindowsCallback(HWND hwnd, LPARAM lParam)
 {
     char title[50];
-    std::set<HWND> windows = *((std::set<HWND>*)lParam);
+    std::set<HWND>& windows = *((std::set<HWND>*)lParam);
     Backend* backend = Backend::get();
 
     DWORD lpdwProcessId;

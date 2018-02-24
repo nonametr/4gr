@@ -28,7 +28,7 @@ ApplicationWindow {
     Connections {
         target: backend
         onReadyToLaunch: {
-            print("onReadyToLaunch => #" + id)
+            startButton.enabled = false
             backend.interceptGame(id)
 
             var targetX = config.profiles[id].target_pos.x
@@ -46,7 +46,7 @@ target.dispatchEvent(evt);")
         }
 
         onEndLaunch: {
-
+            startButton.enabled = true
         }
 
         onGameIntercepted: {
@@ -54,6 +54,7 @@ target.dispatchEvent(evt);")
             if (tabView.count - 2 > id) {
                 backend.beginStartGame(id + 1)
             }
+            startButton.enabled = true
         }
     }
 
@@ -61,6 +62,8 @@ target.dispatchEvent(evt);")
         if (updaterBackend.checkForNewVersion()) {
             updateDialog.open()
         }
+        if (config.autostart)
+            autoStartDialog.show()
     }
 
     Loader {
@@ -469,7 +472,7 @@ target.dispatchEvent(evt);")
                     Rectangle {
                         anchors.fill: parent
                         visible: true
-                        color: styleData.selected ? (config.profiles[styleData.index].enabled ? "#00ff67" : "#a0a0a0") : (config.profiles[styleData.index].enabled ? "#00ad45" : "#636363")
+                        color: styleData.selected ? (config.profiles[styleData.index].enabled ? "#00d857" : "#a0a0a0") : (config.profiles[styleData.index].enabled ? "#00ad45" : "#636363")
                         opacity: styleData.pressed ? 1.0 : 0.8
                         //color: styleData.activeFocus ? (styleData.pressed ? FlatStyle.checkedFocusedAndPressedColor : FlatStyle.focusedColor) : styleData.pressed ? FlatStyle.pressedColor : styleData.selected ? FlatStyle.backgroundColor : !styleData.enabled ? FlatStyle.disabledColor : FlatStyle.styleColor
                     }
@@ -480,7 +483,7 @@ target.dispatchEvent(evt);")
                         width: 10
                         height: 10
                         radius: height * 0.5
-                        color: config.profiles[styleData.index].is_running ? "green" : (tabView.getTab(styleData.index).item.loading ? "red" : "yellow")
+                        color: config.profiles[styleData.index].is_running ? "green" : (tabView.getTab(styleData.index).item.loading ? "#ffba60" : "#b3f442")
                         visible: styleData.index !== tabView.count - 1
 
                         BusyIndicator {
@@ -817,7 +820,7 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
         MenuItem {
             text: "Kill"
             onTriggered: {
-                if (backend.isInGame(tabMenu.tabId)) {
+                if (config.profiles[tabMenu.tabId].is_running) {
                     backend.killGame(tabMenu.tabId)
                 } else {
                     infoDialog.text = "This profile currently not in game!"
@@ -996,7 +999,7 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
         title: "Info"
         icon: StandardIcon.Information
         text: "put text before showing this dialog!"
-        standardButtons: standardButton.Ok
+        standardButtons: StandardButton.Ok
     }
 
     MessageDialog {
@@ -1241,6 +1244,72 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
                         winPosDialog.x = new_x
                         winPosDialog.y = new_y
                     }
+                }
+            }
+        }
+    }
+
+    Window {
+        id: autoStartDialog
+        modality: "ApplicationModal"
+        title: "Auto starting..."
+        minimumHeight: 100
+        maximumHeight: 100
+        minimumWidth: 250
+        maximumWidth: 250
+
+        Text {
+            id: autoStartText
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            font.pixelSize: 14
+            //anchors.top: parent.top
+            //anchors.centerIn: parent
+            text: "Waiting for profiles to load: "
+        }
+
+        Button {
+            text: "Terminate"
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.rightMargin: 5
+            onClicked: {
+                countDownTimer.running = false
+                autoStartDialog.close()
+            }
+        }
+
+        onVisibleChanged: {
+            if (visible === false) {
+                countDownTimer.running = false
+            }
+        }
+
+        Timer {
+            id: countDownTimer
+            property var start_countdown: 4
+            property var ready_to_start: false
+            running: true
+            interval: 1000
+            repeat: true
+            onTriggered: {
+                if (ready_to_start === true) {
+                    autoStartText.text = "Starting in " + --start_countdown + " seconds..."
+                    if (start_countdown === 0) {
+                        running = false
+                        startGame()
+                    }
+                } else {
+                    var ready_count = 0
+                    for (var i = 0; i < config.profiles.length; ++i) {
+                        if (tabView.getTab(i).item.loading === false)
+                            ready_count += 1
+                    }
+
+                    autoStartText.text = "Waiting for profiles to load: "
+                            + ready_count + "/" + config.profiles.length
+                    if (config.profiles.length === ready_count)
+                        ready_to_start = true
                 }
             }
         }

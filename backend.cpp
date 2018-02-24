@@ -42,7 +42,7 @@ QUrl Backend::fromUserInput(const QString& userInput)
 void Backend::beginStartGame(int id)
 {
     ProfileConfig* profile = (ProfileConfig*)config.getProfiles()[id];
-    if (profile->getEnabled() && !profile->isRunning())
+    if (profile->isEnabled() && !profile->isRunning())
     {
         std::set<HWND> gameWindows = listGameWindows();
         knownWindows.insert(gameWindows.begin(), gameWindows.end());
@@ -80,9 +80,7 @@ void Backend::waitForGame(int id)
             SetWindowPos(hwnd, HWND_TOP, win_pos.x(), win_pos.y(), win_pos.w(), win_pos.z(), SWP_SHOWWINDOW);
         });
 
-        profileGameMap.emplace(id, hwnd);
-        gameProfileMap.emplace(hwnd, id);
-        profile->setIsRunning(true);
+        addGameWindow(id, hwnd);
 
         knownWindows.insert(gameWindows.begin(), gameWindows.end());
         std::async(launch::async, [id, this]() {
@@ -93,6 +91,29 @@ void Backend::waitForGame(int id)
             }
             emit gameIntercepted(id);
         });
+    }
+}
+
+void Backend::addGameWindow(int profile_id, HWND hwnd)
+{
+    ProfileConfig* profile = (ProfileConfig*)config.getProfiles()[profile_id];
+
+    profile->setIsRunning(true);
+    profileGameMap.emplace(profile_id, hwnd);
+    gameProfileMap.emplace(hwnd, profile_id);
+}
+
+void Backend::removeGameWindow(int profile_id, HWND hwnd)
+{
+    ProfileConfig* profile = (ProfileConfig*)config.getProfiles()[profile_id];
+
+    profile->setIsRunning(false);
+    profileGameMap.erase(profile_id);
+    gameProfileMap.erase(hwnd);
+
+    if (config.getKeepAlive())
+    {
+        beginStartGame(profile_id);
     }
 }
 

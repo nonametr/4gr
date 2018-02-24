@@ -52,7 +52,7 @@ class ProfileConfig : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool is_running READ isRunning WRITE setIsRunning NOTIFY isRunningChanged)
-    Q_PROPERTY(bool enabled READ getEnabled WRITE setEnabled NOTIFY enabledChanged)
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QVector4D win_pos READ getWindowPos WRITE setWindowPos NOTIFY windowPosChanged)
@@ -85,7 +85,7 @@ public:
     {
         return data.at(ProfileConfigField::URL).value<QString>();
     }
-    bool getEnabled() const
+    bool isEnabled() const
     {
         return data.at(ProfileConfigField::ENABLED).value<bool>();
     }
