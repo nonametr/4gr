@@ -77,6 +77,10 @@ void Config::dataChanged(uint8_t field_id, QVariant new_val)
         return showSSLErrorsChanged();
     case SHOW_IMAGES:
         return showImagesChanged();
+    case ConfigField::DELAY:
+        return delayChanged();
+    default:
+        break;
     }
 }
 

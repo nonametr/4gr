@@ -2,39 +2,32 @@
 #define BACKEND_H
 
 #include "config.h"
-#include <QFileInfo>
-#include <QGuiApplication>
-#include <QList>
-#include <QMouseEvent>
-#include <QObject>
-#include <QQuickItem>
-#include <QTimer>
-#include <QtDebug>
-#include <memory>
+#include "singleton.h"
+#include <qwindowdefs_win.h>
 #include <set>
 #include <stdint.h>
 
-class Backend : public QObject
+class Backend : public QObject, public Singleton<Backend>
 {
     Q_OBJECT
 public:
     Backend(QObject* parent = 0);
-    virtual ~Backend() = default;
+    virtual ~Backend();
 
     static Q_INVOKABLE QUrl fromUserInput(const QString& userInput);
+    static Q_INVOKABLE void restart();
     Q_INVOKABLE void beginStartGame(int id);
     Q_INVOKABLE void interceptGame(int id);
     Q_INVOKABLE void killGame(int id);
-    Q_INVOKABLE bool isInGame(int id);
-    static Q_INVOKABLE void restart();
 
     void waitForGame(int id);
 
     uint64_t pid;
     Config config;
-    std::set<HWND> newWindows;
+
     std::set<HWND> knownWindows;
-    std::map<int, HWND> activeGames; //<profile_id, GameWindow>
+    std::map<int, HWND> profileGameMap; //<profile_id, GameWindow>
+    std::map<HWND, int> gameProfileMap; //<GameWindow, profile_id>
 
 signals:
     void readyToLaunch(int id);

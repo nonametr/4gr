@@ -25,7 +25,8 @@ enum ConfigField : uint8_t
     KEEP_ALIVE,
     SHOW_NAVIGATION,
     SHOW_SSL_ERRORS,
-    SHOW_IMAGES
+    SHOW_IMAGES,
+    DELAY
 };
 
 enum ProfileConfigField : uint8_t
@@ -49,6 +50,7 @@ class Config;
 class ProfileConfig : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool is_running READ isRunning WRITE setIsRunning NOTIFY isRunningChanged)
     Q_PROPERTY(bool enabled READ getEnabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
@@ -86,6 +88,10 @@ public:
     {
         return data.at(ProfileConfigField::ENABLED).value<bool>();
     }
+    bool isRunning() const
+    {
+        return _isRunning;
+    }
 
     void setEnabled(bool new_val)
     {
@@ -111,9 +117,15 @@ public:
     {
         dataChanged(ProfileConfigField::URL, new_val);
     }
+    void setIsRunning(bool new_val)
+    {
+        _isRunning = new_val;
+        emit isRunningChanged();
+    }
 
     void dataChanged(uint8_t field_id, QVariant new_val);
 
+    bool _isRunning;
     map<uint8_t, QVariant> data;
     static const map<uint8_t, FieldData> field_data;
 
@@ -125,6 +137,7 @@ signals:
     void targetPosChanged();
     void urlChanged();
     void enabledChanged();
+    void isRunningChanged();
 
 private:
     Config* _owner;
@@ -133,6 +146,7 @@ private:
 class Config : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(float delay READ getDelay WRITE setDelay NOTIFY delayChanged)
     Q_PROPERTY(bool show_ssl_errors READ getShowSSLErrors WRITE setShowSSLErrors NOTIFY showSSLErrorsChanged)
     Q_PROPERTY(bool show_images READ getShowImages WRITE setShowImages NOTIFY showImagesChanged)
     Q_PROPERTY(bool show_nav READ getShowNav WRITE setShowNav NOTIFY showNavChanged)
@@ -165,12 +179,13 @@ public:
     QList<QObject*> getProfiles() const { return _profiles; }
     QString getTargetWindowName() const { return data.at(ConfigField::TARGET_WINDOW_NAME).value<QString>(); }
     QString getDefaultUrl() const { return data.at(ConfigField::DEFAULT_URL).value<QString>(); }
-    const bool getKeepAlive() const { return data.at(ConfigField::KEEP_ALIVE).value<bool>(); }
-    const bool getAutoStart() const { return data.at(ConfigField::AUTO_START).value<bool>(); }
-    const bool getShowNav() const { return data.at(ConfigField::SHOW_NAVIGATION).value<bool>(); }
-    const bool getShowSSLErrors() const { return data.at(ConfigField::SHOW_SSL_ERRORS).value<bool>(); }
-    const bool getShowImages() const { return data.at(ConfigField::SHOW_IMAGES).value<bool>(); }
+    bool getKeepAlive() const { return data.at(ConfigField::KEEP_ALIVE).value<bool>(); }
+    bool getAutoStart() const { return data.at(ConfigField::AUTO_START).value<bool>(); }
+    bool getShowNav() const { return data.at(ConfigField::SHOW_NAVIGATION).value<bool>(); }
+    bool getShowSSLErrors() const { return data.at(ConfigField::SHOW_SSL_ERRORS).value<bool>(); }
+    bool getShowImages() const { return data.at(ConfigField::SHOW_IMAGES).value<bool>(); }
     QVector2D getStartPos() const { return data.at(ConfigField::START_POS).value<QVector2D>(); }
+    float getDelay() const { return data.at(ConfigField::DELAY).value<float>(); }
 
     void setShowImages(bool new_val)
     {
@@ -204,6 +219,10 @@ public:
     {
         dataChanged(ConfigField::START_POS, new_val);
     }
+    void setDelay(float new_val)
+    {
+        dataChanged(ConfigField::DELAY, new_val);
+    }
 
     void dataChanged(uint8_t field_id, QVariant new_val);
 
@@ -220,6 +239,7 @@ signals:
     void showSSLErrorsChanged();
     void showImagesChanged();
     void startPosChanged();
+    void delayChanged();
 
 private:
     QList<QObject*> _profiles;

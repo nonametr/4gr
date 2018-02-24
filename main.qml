@@ -64,6 +64,11 @@ target.dispatchEvent(evt);")
     }
 
     Loader {
+        id: settingsLoader
+        source: "settings.qml"
+    }
+
+    Loader {
         id: updateLoader
         source: "update.qml"
     }
@@ -120,6 +125,11 @@ target.dispatchEvent(evt);")
         Menu {
             id: editMenu
             title: qsTr("&Edit")
+            MenuItem {
+                text: qsTr("&Settings")
+                onTriggered: settingsLoader.item.show()
+            }
+
             MenuItem {
                 text: qsTr("&Default web page")
                 onTriggered: defaultWebPageDialog.show()
@@ -1054,7 +1064,7 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
                 Text {
                     text: "<b>4GRunner</b> v" + updaterBackend.version
                           + ", by <a href=\"magicmess.online\">magicmess.online</a> Ⓒ 2018<br>"
-                          + "For comments or questions, email: root@magicmess.online"
+                          + "For comments or questions, email: mmessonline@gmail.com"
                     font.pixelSize: 14
                 }
             }

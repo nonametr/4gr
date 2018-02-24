@@ -12,5 +12,6 @@
         <file>tray.qml</file>
         <file>update.qml</file>
         <file>right_bot_corner.png</file>
+        <file>settings.qml</file>
     </qresource>
 </RCC>

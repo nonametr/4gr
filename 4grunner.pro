@@ -1,6 +1,6 @@
 QT += quick webengine widgets
 CONFIG += c++11
-win32:LIBS += -luser32 -lpsapi -lkernel32
+win32:LIBS += -luser32 -lpsapi -lkernel32 -lole32
 RC_ICONS = tray_icon.ico
 
 # The following define makes your compiler emit warnings if you use
@@ -19,7 +19,8 @@ SOURCES += \
     backend.cpp \
     config.cpp \
     updater.cpp \
-    maskedmousearea.cpp
+    maskedmousearea.cpp \
+    winapi.cpp
 
 RESOURCES += qml.qrc
 
@@ -38,4 +39,6 @@ HEADERS += \
     backend.h \
     config.h \
     updater.h \
-    maskedmousearea.h
+    maskedmousearea.h \
+    singleton.h \
+    winapi.h
