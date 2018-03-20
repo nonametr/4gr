@@ -49,7 +49,11 @@ void UpdaterBackend::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 
 void UpdaterBackend::downloadFinished()
 {
-    QFile* file = new QFile(qApp->applicationDirPath() + "/4grunner_new.exe");
+    QString bin_name = QCoreApplication::applicationFilePath();
+    bin_name.insert(bin_name.length() - 4, "_new");
+
+    QFile::remove(bin_name);
+    QFile* file = new QFile(bin_name);
     file->open(QIODevice::ReadWrite);
     file->setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner | QFile::ExeUser | QFile::ReadGroup | QFile::ExeGroup | QFile::ReadOther | QFile::ExeOther);
     file->write(reply->readAll());
@@ -59,6 +63,6 @@ void UpdaterBackend::downloadFinished()
     reply->deleteLater();
     network->deleteLater();
 
-    QProcess::startDetached(qApp->applicationDirPath() + "/4grunner_new.exe");
+    QProcess::startDetached(bin_name);
     QCoreApplication::quit();
 }

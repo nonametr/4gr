@@ -1,7 +1,7 @@
-QT += quick webengine widgets
+QT += qml quick webengine widgets
 CONFIG += c++11
 win32:LIBS += -luser32 -lpsapi -lkernel32 -lole32
-RC_ICONS = tray_icon.ico
+RC_ICONS = img/tray-icon.ico
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -20,7 +20,10 @@ SOURCES += \
     config.cpp \
     updater.cpp \
     maskedmousearea.cpp \
-    winapi.cpp
+    winapi.cpp \
+    system_tray.cpp \
+    json_type_ext.cpp \
+    profile_config.cpp
 
 RESOURCES += qml.qrc
 
@@ -40,4 +43,9 @@ HEADERS += \
     config.h \
     updater.h \
     maskedmousearea.h \
-    winapi.h
+    winapi.h \
+    system_tray.h \
+    json.h \
+    json_type_ext.h \
+    profile_config.h \
+    global.h

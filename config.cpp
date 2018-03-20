@@ -1,68 +1,18 @@
 #include "config.h"
 #include "backend.h"
+#include "profile_config.h"
 #include <QDir>
+#include <QMetaObject>
 #include <QMetaProperty>
 #include <QSettings>
 #include <QtDebug>
 #include <map>
 #include <vector>
 
-const map<uint8_t, FieldData> Config::field_data = {
-    { ConfigField::VERSION, { "version", "1.0" } },
-    { ConfigField::DEFAULT_URL, { "default_url", "https://ru.4game.com/lineage2classic/play/" } },
-    { ConfigField::TARGET_WINDOW_NAME, { "target_window_name", "Lineage II" } },
-    { ConfigField::START_AFTER_PROCESS, { "start_after", "Frost" } },
-    { ConfigField::AUTO_START, { "auto_start", false } },
-    { ConfigField::KEEP_ALIVE, { "keep_alive", false } },
-    { ConfigField::SHOW_NAVIGATION, { "show_navigation", true } },
-    { ConfigField::SHOW_SSL_ERRORS, { "show_ssl_errors", false } },
-    { ConfigField::SHOW_IMAGES, { "show_images", false } },
-    { ConfigField::START_POS, { "start_pos", QVector2D(20, 500) } },
-    { ConfigField::DELAY, { "delay", 0.0f } },
-};
-
-const map<uint8_t, FieldData> ProfileConfig::field_data = {
-    { ProfileConfigField::NAME, { "name", "profile" } },
-    { ProfileConfigField::URL, { "url", "https://ru.4game.com/lineage2classic/play/" } },
-    { ProfileConfigField::WINDOW_POS, { "window_pos", QVector4D(10, 40, 640, 480) } },
-    { ProfileConfigField::SCROLL_POS, { "scroll_pos", QVector2D(0, 0) } },
-    { ProfileConfigField::TARGET_POS, { "target_pos", QVector2D(760, 380) } },
-    { ProfileConfigField::ENABLED, { "enabled", true } }
-};
-
-void ProfileConfig::dataChanged(uint8_t field_id, QVariant new_val)
+void Config::fieldChanged(ConfigField field_id)
 {
-    data[field_id] = new_val;
-    _owner->save(CONFIG_PATH);
-
     switch (field_id)
     {
-    case NAME:
-        return nameChanged();
-    case WINDOW_POS:
-        return windowPosChanged();
-    case SCROLL_POS:
-        return scrollPosChanged();
-    case TARGET_POS:
-        return targetPosChanged();
-    case URL:
-        return urlChanged();
-    case ENABLED:
-        return enabledChanged();
-    default:
-        break;
-    }
-}
-
-void Config::dataChanged(uint8_t field_id, QVariant new_val)
-{
-    data[field_id] = new_val;
-    save(CONFIG_PATH);
-
-    switch (field_id)
-    {
-    case VERSION:
-        break;
     case START_POS:
         return startPosChanged();
     case DEFAULT_URL:
@@ -88,117 +38,118 @@ void Config::dataChanged(uint8_t field_id, QVariant new_val)
     }
 }
 
-void Config::_checkPath(const QString& path, bool last_try)
+json Config::getDefaultJson()
 {
-    QFileInfo check_file(path);
-    if (!check_file.exists() || !check_file.isFile())
+    json result;
+    for (int i = 0; i < CONFIG_FIELD_MAX; ++i)
     {
-        if (last_try == false)
+        ConfigField field_id = static_cast<ConfigField>(i);
+        switch (field_id)
         {
-            resetConfig(path);
-            return _checkPath(path, true);
-        }
-        else
-        {
-            qDebug() << "Can't write default configuration file! Please check file access permisions and restart application!";
-            qTerminate();
+        case START_POS:
+            result[enumToString(field_id)] = "{ \"x\":0.0, \"y\":0.0 }"_json;
+            break;
+        case DEFAULT_URL:
+            result[enumToString(field_id)] = "google.com";
+            break;
+        case TARGET_WINDOW_NAME:
+            result[enumToString(field_id)] = "Lineage II";
+            break;
+        case START_AFTER_PROCESS:
+            result[enumToString(field_id)] = "Frost";
+            break;
+        case AUTO_START:
+            result[enumToString(field_id)] = false;
+            break;
+        case KEEP_ALIVE:
+            result[enumToString(field_id)] = false;
+            break;
+        case SHOW_NAVIGATION:
+            result[enumToString(field_id)] = true;
+            break;
+        case SHOW_SSL_ERRORS:
+            result[enumToString(field_id)] = false;
+            break;
+        case SHOW_IMAGES:
+            result[enumToString(field_id)] = true;
+            break;
+        case DELAY:
+            result[enumToString(field_id)] = 0.0f;
+            break;
+        case AUTO_SAVE:
+            result[enumToString(field_id)] = false;
+            break;
+        default:
+            qFatal("Error! Field not supported!");
+            break;
         }
     }
-
-    QSettings settings(path, QSettings::IniFormat);
-    for (const auto& it_val : Config::field_data)
-    {
-        if (!settings.contains(it_val.second.name))
-        {
-            resetConfig(path);
-            return _checkPath(path, true);
-        }
-    }
-    settings.beginReadArray("profile");
-    settings.setArrayIndex(0);
-    for (const auto& it_val : ProfileConfig::field_data)
-    {
-        if (!settings.contains(it_val.second.name))
-        {
-            resetConfig(path);
-            return _checkPath(path, true);
-        }
-    }
-    settings.endArray();
+    return result;
 }
+void Config::loadFromJson(string data_str)
+{
+    json j_profiles;
+    try
+    {
+        j_data = json::parse(data_str);
+        for (int i = 0; i < CONFIG_FIELD_MAX; ++i)
+        {
+            j_data.at(enumToString(static_cast<ConfigField>(i)));
+        }
+    }
+    catch (exception e)
+    {
+        qDebug() << e.what();
+        qDebug() << "Using default config...";
+        j_data = getDefaultJson();
+    }
 
+    if (j_data.find("profiles") != j_data.end())
+    {
+        for (auto it = j_profiles.begin(); it != j_profiles.end(); ++it)
+        {
+            _profiles.append(new ProfileConfig(this, it.key()));
+        }
+    }
+}
 void Config::load(QString path)
 {
     path.remove("file:///");
-    _checkPath(path);
-    QSettings settings(path, QSettings::IniFormat);
-    for (const auto& it_val : Config::field_data)
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        data[it_val.first] = settings.value(it_val.second.name);
+        qDebug() << "Can't read config file!";
+        j_data = getDefaultJson();
+        return;
     }
-    int profile_count = settings.beginReadArray("profile");
-    for (int i = 0; i < profile_count; ++i)
-    {
-        settings.setArrayIndex(i);
-        ProfileConfig* profile = new ProfileConfig(this);
-        for (const auto& it_val : ProfileConfig::field_data)
-        {
-            profile->data[it_val.first] = settings.value(it_val.second.name);
-        }
-        _profiles.append(profile);
-    }
-    settings.endArray();
+
+    string file_data = file.readAll().toStdString();
+    file.close();
+
+    loadFromJson(file_data);
 }
 void Config::save(QString path)
 {
     path.remove("file:///");
-    QSettings settings(path, QSettings::IniFormat);
-    settings.clear();
-    for (const auto& it_val : data)
+
+    QFile file(path);
+    if (!file.open(QFile::WriteOnly | QFile::Text))
     {
-        settings.setValue(Config::field_data.at(it_val.first).name, it_val.second);
+        qDebug() << "Can't write config file!";
+        return;
     }
-    settings.beginWriteArray("profile");
-    for (int i = 0; i < _profiles.length(); ++i)
-    {
-        settings.setArrayIndex(i);
-        ProfileConfig* profile = (ProfileConfig*)_profiles[i];
-        for (const auto& it_val : profile->data)
-        {
-            settings.setValue(ProfileConfig::field_data.at(it_val.first).name, it_val.second);
-        }
-    }
-    settings.endArray();
+    file.write(j_data.dump(4).c_str());
+    file.close();
 }
 
 Q_INVOKABLE void Config::appendProfile()
 {
-    ProfileConfig* newProfile = new ProfileConfig(this);
-    for (const auto& it_val : ProfileConfig::field_data)
-    {
-        newProfile->data[it_val.first] = it_val.second.default_val;
-    }
-    newProfile->setUrl(getDefaultUrl());
-    _profiles.append(newProfile);
-    save(CONFIG_PATH);
-}
+    json& j_profiles = j_data["profiles"];
+    size_t profiles_count = j_profiles.size();
 
-Q_INVOKABLE void Config::resetConfig(QString path)
-{
-    QSettings settings(path, QSettings::IniFormat);
-    settings.clear();
-    for (const auto& it_val : Config::field_data)
-    {
-        settings.setValue(it_val.second.name, it_val.second.default_val);
-    }
-    settings.beginWriteArray("profile");
-    for (int i = 0; i < 1; ++i)
-    {
-        settings.setArrayIndex(i);
-        for (const auto& it_val : ProfileConfig::field_data)
-        {
-            settings.setValue(it_val.second.name, it_val.second.default_val);
-        }
-    }
-    settings.endArray();
+    string new_profile_name = "profile_" + std::to_string(profiles_count + 1);
+    ProfileConfig::getDefaultJson(j_profiles[new_profile_name], new_profile_name);
+
+    ProfileConfig* newProfile = new ProfileConfig(this, new_profile_name);
+    _profiles.append(newProfile);
 }

@@ -1,17 +1,30 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>click_area.png</file>
-        <file>button-start-game.png</file>
-        <file>icons/go-next.png</file>
-        <file>icons/go-previous.png</file>
-        <file>icons/process-stop.png</file>
-        <file>icons/view-refresh.png</file>
-        <file>lineage_2_background_by_vas_co.jpg</file>
-        <file>tray-icon.png</file>
-        <file>tray.qml</file>
-        <file>update.qml</file>
-        <file>right_bot_corner.png</file>
-        <file>settings.qml</file>
+        <file>UpdateWindow.qml</file>
+        <file>SettingsWindow.qml</file>
+        <file>img/button-start-game.png</file>
+        <file>img/click_area.png</file>
+        <file>img/go-next.png</file>
+        <file>img/go-previous.png</file>
+        <file>img/lineage_2_background_by_vas_co.jpg</file>
+        <file>img/logo.png</file>
+        <file>img/process-stop.png</file>
+        <file>img/right_bot_corner.png</file>
+        <file>img/tray-icon.ico</file>
+        <file>img/view-refresh.png</file>
+        <file>backend.cpp</file>
+        <file>backend.h</file>
+        <file>config.cpp</file>
+        <file>config.h</file>
+        <file>main.cpp</file>
+        <file>maskedmousearea.cpp</file>
+        <file>maskedmousearea.h</file>
+        <file>system_tray.cpp</file>
+        <file>system_tray.h</file>
+        <file>updater.cpp</file>
+        <file>updater.h</file>
+        <file>winapi.cpp</file>
+        <file>winapi.h</file>
     </qresource>
 </RCC>

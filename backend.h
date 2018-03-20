@@ -10,10 +10,9 @@ class Backend : public QObject
 {
     Q_OBJECT
 public:
-    Backend(QObject* parent = 0);
     virtual ~Backend();
 
-    static Backend* get() { return _instance; }
+    static Backend* get() { return &_instance; }
 
     static Q_INVOKABLE QUrl fromUserInput(const QString& userInput);
     static Q_INVOKABLE void restart();
@@ -38,7 +37,8 @@ signals:
     void endLaunch();
 
 private:
-    static Backend* _instance;
+    Backend(QObject* parent = 0);
+    static Backend _instance;
 };
 
 #endif // BACKEND_H

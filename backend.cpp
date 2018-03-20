@@ -1,4 +1,5 @@
 #include "backend.h"
+#include "profile_config.h"
 #include "winapi.h"
 #include <QFileInfo>
 #include <QGuiApplication>
@@ -16,15 +17,11 @@
 #include <string>
 #include <tchar.h>
 
-Backend* Backend::_instance = nullptr;
+Backend Backend::_instance;
 
 Backend::Backend(QObject* parent) : QObject(parent)
 {
-    assert(_instance == 0);
-    _instance = this;
-
     initializeHook();
-    config.load(CONFIG_PATH);
 }
 
 Backend::~Backend()

@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls.Styles 1.4
 
 Window {
-    id: settings
+    id: settingsWindow
     //flags: Qt.FramelessWindowHint | Qt.Window
     //color: "transparent"
     opacity: 1

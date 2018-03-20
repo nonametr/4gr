@@ -29,7 +29,7 @@ public:
     QNetworkReply* reply = nullptr;
     QEventLoop versionEventLoop;
     QEventLoop updateLoop;
-    const QString version = "1.0.2";
+    const QString version = "1.0.3";
 
     float getDownloadProgress() const
     {

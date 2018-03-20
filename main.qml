@@ -18,13 +18,25 @@ ApplicationWindow {
     //flags: Qt.FramelessWindowHint | Qt.Window
     //color: "transparent"
     opacity: 1
-    title: "4GRunner"
+    title: "4GR"
     width: 1024
     height: 750
     visible: true
     property Item currentWebView: tabView.getTab(tabView.currentIndex).item
     property int showTabPopup: -1
 
+    Connections {
+        target: tray
+        onShowHide: root.visible = !root.visible
+        onStartGame: startGame()
+        onUpdate: {
+            if (updaterBackend.checkForNewVersion()) {
+                updateDialog.open()
+            } else {
+                noUpdateDialog.open()
+            }
+        }
+    }
     Connections {
         target: backend
         onReadyToLaunch: {
@@ -66,31 +78,11 @@ target.dispatchEvent(evt);")
             autoStartDialog.show()
     }
 
-    Loader {
-        id: settingsLoader
-        source: "settings.qml"
+    SettingsWindow {
+        id: settingsWindow
     }
-
-    Loader {
-        id: updateLoader
-        source: "update.qml"
-    }
-
-    Loader {
-        id: trayLoader
-        source: "tray.qml"
-        Connections {
-            target: trayLoader.item
-            onShowHide: root.visible = !root.visible
-            onStartGame: startGame()
-            onUpdate: {
-                if (updaterBackend.checkForNewVersion()) {
-                    updateDialog.open()
-                } else {
-                    noUpdateDialog.open()
-                }
-            }
-        }
+    UpdateWindow {
+        id: updateWindow
     }
 
     signal loadStatusChanged
@@ -130,7 +122,7 @@ target.dispatchEvent(evt);")
             title: qsTr("&Edit")
             MenuItem {
                 text: qsTr("&Settings")
-                onTriggered: settingsLoader.item.show()
+                onTriggered: settingsWindow.show()
             }
 
             MenuItem {
@@ -227,20 +219,20 @@ target.dispatchEvent(evt);")
 
             ToolButton {
                 id: backButton
-                iconSource: "icons/go-previous.png"
+                iconSource: "img/go-previous.png"
                 onClicked: currentWebView.goBack()
                 enabled: currentWebView && currentWebView.canGoBack
             }
             ToolButton {
                 id: forwardButton
-                iconSource: "icons/go-next.png"
+                iconSource: "img/go-next.png"
                 onClicked: currentWebView.goForward()
                 enabled: currentWebView && currentWebView.canGoForward
             }
             ToolButton {
                 id: reloadButton
                 iconSource: currentWebView
-                            && currentWebView.loading ? "icons/process-stop.png" : "icons/view-refresh.png"
+                            && currentWebView.loading ? "img/process-stop.png" : "img/view-refresh.png"
                 onClicked: currentWebView
                            && currentWebView.loading ? currentWebView.stop(
                                                            ) : currentWebView.reload()
@@ -304,6 +296,7 @@ target.dispatchEvent(evt);")
                     && currentWebView.loadProgress < 100) ? currentWebView.loadProgress : 0
         }
     }
+
     Rectangle {
         id: rootRect
         anchors.fill: parent
@@ -319,6 +312,7 @@ target.dispatchEvent(evt);")
             }
 
             Component.onCompleted: {
+
                 for (var i = 0; i < config.profiles.length; ++i) {
                     var tab = tabView.insertTab(i, config.profiles[i].name,
                                                 webPage)
@@ -372,6 +366,7 @@ target.dispatchEvent(evt);")
                 WebEngineView {
                     id: webPageView
                     focus: true
+
                     anchors.fill: parent
 
                     onLoadingChanged: {
@@ -393,47 +388,11 @@ target.dispatchEvent(evt);")
                         }
                     }
 
-                    onRenderProcessTerminated: {
-                        var status = ""
-                        switch (terminationStatus) {
-                        case WebEngineView.NormalTerminationStatus:
-                            status = "(normal exit)"
-                            break
-                        case WebEngineView.AbnormalTerminationStatus:
-                            status = "(abnormal exit)"
-                            break
-                        case WebEngineView.CrashedTerminationStatus:
-                            status = "(crashed)"
-                            break
-                        case WebEngineView.KilledTerminationStatus:
-                            status = "(killed)"
-                            break
-                        }
-
-                        print("Render process exited with code " + exitCode + " " + status)
-                        reloadTimer.running = true
-                    }
-
-                    onWindowCloseRequested: {
-                        if (tabView.count === 1)
-                            root.close()
-                        //else
-                        //tabView.removeTab(tabView.currentIndex)
-                    }
                     Component.onCompleted: {
                         reload()
                     }
-
-                    Timer {
-                        id: reloadTimer
-                        interval: 0
-                        running: false
-                        repeat: false
-                        onTriggered: currentWebView.reload()
-                    }
                 }
             }
-
             style: TabViewStyle {
                 readonly property int frameWidth: Math.round(
                                                       FlatStyle.scaleFactor)
@@ -454,7 +413,6 @@ target.dispatchEvent(evt);")
                         font.pixelSize: 18
                     }
                 }
-
                 tab: Item {
                     id: thisTab
                     readonly property int totalWidth: styleData.availableWidth
@@ -478,6 +436,7 @@ target.dispatchEvent(evt);")
                     }
                     Rectangle {
                         id: statusRect
+
                         x: 10
                         y: (thisTab.implicitHeight - height) * 0.5
                         width: 10
@@ -485,7 +444,6 @@ target.dispatchEvent(evt);")
                         radius: height * 0.5
                         color: config.profiles[styleData.index].is_running ? "green" : (tabView.getTab(styleData.index).item.loading ? "#ffba60" : "#b3f442")
                         visible: styleData.index !== tabView.count - 1
-
                         BusyIndicator {
                             id: busy
                             parent: thisTab
@@ -520,7 +478,7 @@ target.dispatchEvent(evt);")
                                && styleData.selected ? FlatStyle.disabledColor : styleData.selected
                                                        && styleData.enabled
                                                        && !styleData.activeFocus
-                                                       && !styleData.pressed ? FlatStyle.styleColor : FlatStyle.selectedTextColor
+                                                       && !styleData.pressed ? FlatStyle.styleColor : FlatStyle.disabledColor
                     }
 
                     MouseArea {
@@ -544,7 +502,6 @@ target.dispatchEvent(evt);")
                         }
                     }
                 }
-
                 tabBar: Rectangle {
                     color: FlatStyle.backgroundColor
                     border.color: control.frameVisible ? FlatStyle.lightFrameColor : "transparent"
@@ -561,7 +518,6 @@ target.dispatchEvent(evt);")
                 }
             }
         }
-
         Item {
             id: profileButton
             parent: Overlay.overlay
@@ -573,7 +529,7 @@ target.dispatchEvent(evt);")
             Image {
                 id: profileRect
                 anchors.fill: parent
-                source: "right_bot_corner.png"
+                source: "img/right_bot_corner.png"
                 scale: profileMouseArea.containsMouse ? 1.1 : 1.0
                 opacity: profileMouseArea.containsMouse ? 0.9 : 1
 
@@ -658,7 +614,6 @@ target.dispatchEvent(evt);")
                 }
             }
         }
-
         Item {
             id: targetButton
             width: 40
@@ -700,7 +655,7 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
 
             Image {
                 id: targetImg
-                source: "click_area.png"
+                source: "img/click_area.png"
                 anchors.fill: parent
             }
 
@@ -728,7 +683,6 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
                 hoverEnabled: true
             }
         }
-
         Item {
             id: startButton
             width: 240
@@ -747,7 +701,7 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
 
             Image {
                 id: startImg
-                source: "button-start-game.png"
+                source: "img/button-start-game.png"
                 anchors.fill: parent
             }
 
@@ -843,7 +797,6 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
             }
         }
     }
-
     Timer {
         id: tabMenuCheckTimer
         interval: 200
@@ -858,7 +811,6 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
             showTabPopup = -1
         }
     }
-
     MouseArea {
         id: globalMouseArea
         anchors.fill: parent
@@ -978,7 +930,7 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
         standardButtons: StandardButton.Yes | StandardButton.No
         onYes: {
             updaterBackend.downloadNewVersion()
-            updateLoader.item.show()
+            updateWindow.show()
         }
         onNo: console.log("disabled")
     }
@@ -1044,31 +996,38 @@ target.insertAdjacentHTML('afterend', '<div id = \"mmo_inj_promo\"><font style=\
     }
     Window {
         id: aboutDialog
-        maximumWidth: logoImg.width + 150
-        maximumHeight: 125
-        minimumWidth: logoImg.width + 150
-        minimumHeight: 125
+        maximumWidth: logoImg.width + 390
+        maximumHeight: 100
+        minimumWidth: logoImg.width + 390
+        minimumHeight: 100
         modality: "ApplicationModal"
         title: "About"
         Rectangle {
             anchors.fill: parent
-            anchors.leftMargin: 10
-            anchors.rightMargin: 10
-            anchors.topMargin: 10
-            anchors.bottomMargin: 10
-            Column {
+            Row {
                 spacing: 10
                 Image {
                     id: logoImg
-                    source: "http://magicmess.online/ts3/mmo_logo4.png"
+                    source: "img/logo.png"
                 }
 
                 Text {
                     text: "<b>4GRunner</b> v" + updaterBackend.version
-                          + ", by <a href=\"magicmess.online\">magicmess.online</a> Ⓒ 2018<br>"
+                          + ", by <a href=\"magicmess.online\\4gr\\\">magicmess.online</a> Ⓒ 2018<br>"
                           + "For comments or questions, email: mmessonline@gmail.com"
                     font.pixelSize: 14
+                    onLinkActivated: Qt.openUrlExternally(
+                                         "http://magicmess.online/")
                 }
+            }
+
+            Button {
+                text: "OK"
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.rightMargin: 5
+                anchors.bottomMargin: 5
+                onClicked: aboutDialog.close()
             }
         }
     }
